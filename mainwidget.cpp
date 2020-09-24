@@ -249,7 +249,7 @@ void MainWidget::paintGL()
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);
 //! [6]
-
+//!
     texture_grass->bind(0);
     program.setUniformValue("texture_grass", 0);
 

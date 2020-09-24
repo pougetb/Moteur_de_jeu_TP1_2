@@ -55,6 +55,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QRandomGenerator>
+#include <QImage>
 
 class GeometryEngine : protected QOpenGLFunctions_3_1
 {
