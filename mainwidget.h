@@ -91,7 +91,10 @@ private:
     QOpenGLShaderProgram program;
     GeometryEngine *geometries;
 
-    QOpenGLTexture *texture;
+    QOpenGLTexture *texture_grass;
+    QOpenGLTexture *texture_rock;
+    QOpenGLTexture *texture_snowrocks;
+    QOpenGLTexture *height_map;
 
     QMatrix4x4 projection;
 

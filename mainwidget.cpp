@@ -57,7 +57,10 @@
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
-    texture(0),
+    texture_grass(0),
+    texture_rock(0),
+    texture_snowrocks(0),
+    height_map(0),
     angularSpeed(0)
 {
 }
@@ -67,7 +70,10 @@ MainWidget::~MainWidget()
     // Make sure the context is current when deleting the texture
     // and the buffers.
     makeCurrent();
-    delete texture;
+    delete texture_grass;
+    delete texture_rock;
+    delete texture_snowrocks;
+    delete height_map;
     delete geometries;
     doneCurrent();
 }
@@ -220,18 +226,25 @@ void MainWidget::initShaders()
 //! [4]
 void MainWidget::initTextures()
 {
-    // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/grass.png").mirrored());
+    texture_grass = new QOpenGLTexture(QImage(":/grass.png").mirrored());
+    texture_grass->setMinificationFilter(QOpenGLTexture::Nearest);
+    texture_grass->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture_grass->setWrapMode(QOpenGLTexture::Repeat);
 
-    // Set nearest filtering mode for texture minification
-    texture->setMinificationFilter(QOpenGLTexture::Nearest);
+    texture_rock = new QOpenGLTexture(QImage(":/rock.png").mirrored());
+    texture_rock->setMinificationFilter(QOpenGLTexture::Nearest);
+    texture_rock->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture_rock->setWrapMode(QOpenGLTexture::Repeat);
 
-    // Set bilinear filtering mode for texture magnification
-    texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture_snowrocks = new QOpenGLTexture(QImage(":/snowrocks.png").mirrored());
+    texture_snowrocks->setMinificationFilter(QOpenGLTexture::Nearest);
+    texture_snowrocks->setMagnificationFilter(QOpenGLTexture::Linear);
+    texture_snowrocks->setWrapMode(QOpenGLTexture::Repeat);
 
-    // Wrap texture coordinates by repeating
-    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
-    texture->setWrapMode(QOpenGLTexture::Repeat);
+    height_map = new QOpenGLTexture(QImage(":/heightmap-1024x1024.png").mirrored());
+    height_map->setMinificationFilter(QOpenGLTexture::Nearest);
+    height_map->setMagnificationFilter(QOpenGLTexture::Linear);
+    height_map->setWrapMode(QOpenGLTexture::Repeat);
 }
 //! [4]
 
@@ -257,8 +270,6 @@ void MainWidget::paintGL()
     // Clear color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    texture->bind();
-
 //! [6]
     // Calculate model view transformation
     QMatrix4x4 matrix;
@@ -270,8 +281,14 @@ void MainWidget::paintGL()
     program.setUniformValue("mvp_matrix", projection * matrix);
 //! [6]
 
-    // Use texture unit 0 which contains cube.png
-    program.setUniformValue("texture", 0);
+    texture_grass->bind(0);
+    program.setUniformValue("texture_grass", 0);
+
+    texture_rock->bind(1);
+    program.setUniformValue("texture_rock",1);
+
+    texture_snowrocks->bind(2);
+    program.setUniformValue("texture_snowrocks", 2);
 
     // Draw cube geometry
     geometries->drawCubeGeometry(&program);
