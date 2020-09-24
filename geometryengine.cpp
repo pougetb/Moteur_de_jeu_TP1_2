@@ -162,10 +162,12 @@ void GeometryEngine::initSquarePlane(int size)
 
     std::vector<VertexData> vertices;
 
+    float offset_half = size / 2.0;
+
     for(int x = 0; x < size; x++){
         for(int y = 0; y < size; y++){
             float z = static_cast<float>(QRandomGenerator::global()->bounded(1.0f));
-            vertices.push_back({QVector3D(x, y, z), QVector2D(x, y)});
+            vertices.push_back({QVector3D(x - offset_half, y - offset_half, z), QVector2D(x, y)});
         }
     }
 
