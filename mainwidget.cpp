@@ -118,6 +118,31 @@ void MainWidget::timerEvent(QTimerEvent *)
 }
 //! [1]
 
+void MainWidget::keyPressEvent(QKeyEvent *e){
+    float step = 0.2f;
+    if(e->key() == Qt::Key_Up){
+        offset_y -= step;
+    }
+    if(e->key() == Qt::Key_Down){
+        offset_y += step;
+    }
+    if(e->key() == Qt::Key_Left){
+        offset_x += step;
+    }
+    if(e->key() == Qt::Key_Right){
+        offset_x -= step;
+    }
+    if(e->key() == Qt::Key_PageUp){
+        offset_z += step;
+    }
+    if(e->key() == Qt::Key_PageDown){
+        offset_z -= step;
+    }
+
+    update();
+}
+
+
 void MainWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -207,8 +232,9 @@ void MainWidget::paintGL()
 //! [6]
     // Calculate model view transformation
     QMatrix4x4 matrix;
-    matrix.translate(-2.0, -2.0, -5.0);
+    matrix.translate(-2.0f + offset_x, -2.0f + offset_y, -5.0f + offset_z);
     matrix.rotate(rotation);
+
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);
 //! [6]
