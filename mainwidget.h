@@ -103,6 +103,8 @@ private:
     qreal angularSpeed;
     QQuaternion rotation;
 
+    bool auto_rotate = false;
+
     float offset_x = 0;
     float offset_y = 0;
     float offset_z = 0;
