@@ -75,45 +75,56 @@ MainWidget::~MainWidget()
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-    // Save mouse press position
-    mousePressPosition = QVector2D(e->localPos());
+    if(!auto_rotate) {
+        // Save mouse press position
+        mousePressPosition = QVector2D(e->localPos());
+    }
 }
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
+    if(!auto_rotate) {
+        // Mouse release position - mouse press position
+        QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
 
-    // Rotation axis is perpendicular to the mouse position difference
-    // vector
-    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
+        // Rotation axis is perpendicular to the mouse position difference
+        // vector
+        QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
 
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
+        // Accelerate angular speed relative to the length of the mouse sweep
+        qreal acc = diff.length() / 100.0;
 
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
+        // Calculate new rotation axis as weighted sum
+        rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
 
-    // Increase angular speed
-    angularSpeed = acc;
+        // Increase angular speed
+        angularSpeed = acc;
+    }
 }
 //! [0]
 
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
+    if(!auto_rotate) {
+        // Decrease angular speed (friction)
+        angularSpeed *= 0.99;
 
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
+        // Stop rotation when speed goes below threshold
+        if (angularSpeed < 0.01) {
+            angularSpeed = 0.0;
+        } else {
+            // Update rotation
+            rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+
+            // Request an update
+            update();
+        }
     } else {
-        // Update rotation
         rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
         // Request an update
         update();
+
     }
 }
 //! [1]
@@ -137,6 +148,25 @@ void MainWidget::keyPressEvent(QKeyEvent *e){
     }
     if(e->key() == Qt::Key_PageDown){
         offset_z -= step;
+    }
+
+    if(e->key() == Qt::Key_R){
+
+        if(!auto_rotate) {
+            auto_rotate = !auto_rotate;
+            offset_x = 0;
+            offset_y = 0;
+            offset_z = -10;
+
+            rotation = QQuaternion::fromEulerAngles(0.0, 0.0, 0.0);
+            rotationAxis = QVector3D(0,1,1);
+            angularSpeed = 0.5;
+        } else {
+            auto_rotate = !auto_rotate;
+            rotation = QQuaternion::fromEulerAngles(0.0, 0.0, 0.0);
+            angularSpeed = 0;
+        }
+
     }
 
     update();
@@ -212,7 +242,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 15.0, fov = 45.0;
+    const qreal zNear = 3.0, zFar = 30.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -232,8 +262,9 @@ void MainWidget::paintGL()
 //! [6]
     // Calculate model view transformation
     QMatrix4x4 matrix;
-    matrix.translate(-2.0f + offset_x, -2.0f + offset_y, -5.0f + offset_z);
+    matrix.translate(0.0f + offset_x, 0.0f + offset_y, -5.0f + offset_z);
     matrix.rotate(rotation);
+    matrix.lookAt(QVector3D(1,1,1), QVector3D(0,0,0), QVector3D(0,0,1));
 
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);
