@@ -164,7 +164,7 @@ void GeometryEngine::initSquarePlane(int size)
 
     for(int x = 0; x < size; x++){
         for(int y = 0; y < size; y++){
-            vertices.push_back({QVector3D(x, y, 0.0f), QVector2D(0.0f, 0.0f)});
+            vertices.push_back({QVector3D(x, y, 0.0f), QVector2D(x, y)});
         }
     }
 
@@ -200,7 +200,7 @@ void GeometryEngine::initSquarePlane(int size)
 
     nb_indices = indices.size();
 
-    glPolygonMode( GL_FRONT, GL_LINE );
+    glPolygonMode( GL_FRONT, GL_FILL );
 
 //! [1]
 }
