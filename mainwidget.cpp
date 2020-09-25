@@ -290,6 +290,9 @@ void MainWidget::paintGL()
     texture_snowrocks->bind(2);
     program.setUniformValue("texture_snowrocks", 2);
 
+    height_map->bind(3);
+    program.setUniformValue("height_map", 3);
+
     // Draw cube geometry
     geometries->drawCubeGeometry(&program);
 }

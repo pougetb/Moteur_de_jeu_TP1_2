@@ -72,7 +72,7 @@ GeometryEngine::GeometryEngine()
     // Initializes cube geometry and transfers it to VBOs
     //initCubeGeometry();
 
-    initSquarePlane(16);
+    initSquarePlane(128);
 }
 
 GeometryEngine::~GeometryEngine()
@@ -162,14 +162,14 @@ void GeometryEngine::initSquarePlane(int size)
 
     std::vector<VertexData> vertices;
 
-    QImage height_map = QImage(":/heightmap-1024x1024.png");
+    //QImage height_map = QImage(":/heightmap-1024x1024.png");
 
     float offset_half = size / 2.0;
 
     for(int x = 0; x < size; x++){
         for(int y = 0; y < size; y++){
-            float z = height_map.pixelColor(x/static_cast<double>(size) * height_map.width(), y/static_cast<double>(size) * height_map.height()).red() / 256.0f;
-            vertices.push_back({QVector3D(x - offset_half, y - offset_half, z), QVector2D(x, y)});
+            //float z = height_map.pixelColor(x/static_cast<double>(size) * height_map.width(), y/static_cast<double>(size) * height_map.height()).red() / 256.0f;
+            vertices.push_back({QVector3D((x - offset_half) * 16.0 / size, (y - offset_half) * 16.0 / size, 0.0f), QVector2D(1.0f * x/size, 1.0f * y/size)});
         }
     }
 
@@ -204,6 +204,9 @@ void GeometryEngine::initSquarePlane(int size)
     indexBuf.allocate(&indices[0], indices.size() * sizeof(GLushort));
 
     nb_indices = indices.size();
+//    qInfo() << nb_indices;
+//    qInfo() << indices;
+
 
     glPolygonMode( GL_FRONT, GL_FILL );
 
